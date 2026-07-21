@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+<title>Rutina PPL</title>
+<meta name="theme-color" content="#0B0E11" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230B0E11'/%3E%3Crect x='30' y='45' width='40' height='10' rx='5' fill='%235EEAD4'/%3E%3Crect x='18' y='38' width='10' height='24' rx='4' fill='%235EEAD4'/%3E%3Crect x='72' y='38' width='10' height='24' rx='4' fill='%235EEAD4'/%3E%3C/svg%3E" />
+<style>
+  @font-face { font-family: 'system'; src: local(-apple-system), local(sans-serif); }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; background: #0B0E11; color: #F4F6F8;
+    font-family: -apple-system, Roboto, "Segoe UI", Arial, sans-serif; }
+  input:focus, select:focus { outline: 1px solid #5EEAD4; }
+  button { cursor: pointer; font-family: inherit; }
+  .wrap { max-width: 480px; margin: 0 auto; padding: 20px 16px 100px; }
+  .brand { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .brand .dot { width: 10px; height: 10px; border-radius: 3px; background: #5EEAD4; }
+  .brand span { font-weight: 700; font-size: 13px; letter-spacing: 2px; color: #8A93A0; text-transform: uppercase; }
+  .tabs { display: flex; gap: 8px; margin: 16px 0 6px; }
+  .tab { flex: 1; padding: 10px 0; border-radius: 12px; border: none; background: #12151A; color: #8A93A0;
+    font-weight: 700; font-size: 14px; letter-spacing: 0.5px; }
+  .tab.active { background: #5EEAD4; color: #0B0E11; }
+  .head { display: flex; justify-content: space-between; align-items: baseline; margin: 14px 2px 18px; }
+  .head h1 { font-size: 24px; font-weight: 700; margin: 0; }
+  .head .time { display: flex; align-items: center; gap: 6px; color: #8A93A0; font-size: 13px; }
+  .card { background: #12151A; border: 1px solid #1F242B; border-radius: 16px; margin-bottom: 12px; overflow: hidden; }
+  .card-head { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 16px; background: none; border: none; text-align: left; color: inherit; }
+  .card-head .name { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; }
+  .card-head .meta { font-size: 12.5px; color: #8A93A0; margin-top: 4px; }
+  .card-body { padding: 0 16px 18px; display: none; }
+  .card.open .card-body { display: block; }
+  .card.open .chev { transform: rotate(90deg); }
+  .altbtn { display: flex; align-items: center; gap: 6px; background: none; border: none; color: #5EEAD4; font-size: 12.5px; margin-left: auto; }
+  .alt-row-wrap { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+  .alts { margin-bottom: 14px; display: flex; flex-direction: column; gap: 6px; }
+  .alt-opt { text-align: left; padding: 9px 12px; border-radius: 10px; font-size: 13px; background: #171B21; border: 1px solid #1F242B; color: #C7CCD3; }
+  .alt-opt.active { background: #1B2A28; border: 1px solid #2A5F55; color: #5EEAD4; }
+  .grid-head { display: grid; grid-template-columns: 22px 1fr 1fr 1.3fr 34px; gap: 6px; margin-bottom: 6px; }
+  .grid-head span { font-size: 10.5px; color: #8A93A0; text-transform: uppercase; letter-spacing: 0.5px; }
+  .set-row { display: grid; grid-template-columns: 22px 1fr 1fr 1.3fr 34px; gap: 6px; align-items: center; margin-bottom: 8px; }
+  .set-row .idx { color: #8A93A0; font-size: 14px; }
+  .set-row input, .set-row select { background: #0E1114; border: 1px solid #1F242B; border-radius: 8px; color: #F4F6F8;
+    padding: 8px 4px; font-size: 13.5px; width: 100%; text-align: center; }
+  .set-row input:disabled { opacity: 0.35; }
+  .okbtn { width: 34px; height: 34px; border-radius: 999px; border: none; font-weight: 700; font-size: 13px; background: #5EEAD4; color: #0B0E11; }
+  .okbtn.done { background: #1B2A28; color: #5EEAD4; }
+  .okbtn:disabled { opacity: 0.35; }
+  .suggestion { margin-top: 10px; padding: 10px 12px; border-radius: 10px; display: flex; gap: 8px; }
+  .suggestion.up { background: #132420; border: 1px solid #1E4A40; }
+  .suggestion.down { background: #2A1418; border: 1px solid #4A1E24; }
+  .suggestion.same { background: #171B21; border: 1px solid #1F242B; }
+  .suggestion .title { font-weight: 700; font-size: 12.5px; }
+  .suggestion .reason { color: #8A93A0; font-size: 12px; margin-top: 2px; }
+  .abs-toggle { display: flex; align-items: center; justify-content: space-between; margin: 18px 2px 10px; }
+  .abs-toggle span { font-size: 13px; letter-spacing: 1.5px; color: #8A93A0; text-transform: uppercase; }
+  .abs-toggle button { background: none; border: none; color: #5EEAD4; font-size: 12.5px; }
+  .overlay { position: fixed; inset: 0; background: rgba(7,9,11,0.94); display: none; flex-direction: column;
+    align-items: center; justify-content: center; z-index: 50; padding: 24px; }
+  .overlay.show { display: flex; }
+  .overlay .close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: #8A93A0; font-size: 22px; }
+  .overlay .label { color: #8A93A0; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
+  .ring-wrap { position: relative; width: 220px; height: 220px; }
+  .ring-time { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 52px; font-weight: 700; }
+  .overlay .actions { display: flex; gap: 12px; margin-top: 28px; }
+  .overlay .actions button { border-radius: 999px; padding: 12px 20px; font-size: 13.5px; border: 1px solid #2A303A; background: #1C2127; color: #F4F6F8; }
+  .overlay .actions .skip { background: #5EEAD4; color: #0B0E11; border: none; font-weight: 700; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+// ---------- Data ----------
+const DAYS = [
+  { id: "empuje", label: "Empuje", sub: "Pecho · Hombro · Tríceps",
+    exercises: [
+      { id: "press-banca", name: "Press de Banca", equip: "Máquina", sets: 4, repMin: 8, repMax: 12, rest: 90, compound: true, alts: ["Press de banca con mancuernas", "Press en máquina Smith"] },
+      { id: "press-militar", name: "Press Militar", equip: "Máquina / Mancuernas", sets: 3, repMin: 8, repMax: 12, rest: 90, compound: true, alts: ["Press Arnold", "Press en polea de pie"] },
+      { id: "press-inclinado", name: "Press de Pecho Inclinado", equip: "Máquina", sets: 3, repMin: 10, repMax: 15, rest: 75, compound: true, alts: ["Press inclinado con mancuernas", "Fondos en paralelas"] },
+      { id: "elev-laterales", name: "Elevaciones Laterales", equip: "Mancuernas", sets: 3, repMin: 12, repMax: 15, rest: 60, compound: false, alts: ["Elevaciones en polea", "Elevaciones en máquina"] },
+      { id: "mariposa", name: "Mariposa con Brazos Rectos", equip: "Cable", sets: 3, repMin: 12, repMax: 15, rest: 60, compound: false, alts: ["Pec deck / Mariposa en máquina", "Cruce de poleas"] },
+      { id: "ext-triceps", name: "Extensiones de Tríceps con Cuerda", equip: "Cable", sets: 3, repMin: 10, repMax: 15, rest: 60, compound: false, alts: ["Press francés", "Fondos en banco"] },
+    ],
+    abs: [ { id: "crunchs", name: "Crunchs Sentado", equip: "Máquina", sets: 2, repMin: 8, repMax: 12, rest: 45, compound: false, alts: ["Crunch en polea alta", "Crunch en el suelo"] } ],
+  },
+  { id: "tiron", label: "Tirón", sub: "Espalda · Bíceps",
+    exercises: [
+      { id: "jalon-pecho", name: "Jalón al Pecho", equip: "Polea", sets: 4, repMin: 8, repMax: 12, rest: 90, compound: true, alts: ["Dominadas asistidas", "Jalón en máquina"] },
+      { id: "remo-sentado", name: "Remo Sentado en Polea", equip: "Polea", sets: 4, repMin: 8, repMax: 12, rest: 90, compound: true, alts: ["Remo en máquina", "Remo en T"] },
+      { id: "remo-mancuerna", name: "Remo con Mancuerna a un Brazo", equip: "Mancuerna", sets: 3, repMin: 10, repMax: 12, rest: 75, compound: true, alts: ["Remo en máquina Hammer", "Remo en polea baja a un brazo"] },
+      { id: "face-pull", name: "Face Pull", equip: "Polea", sets: 3, repMin: 12, repMax: 15, rest: 60, compound: false, alts: ["Elevación posterior en máquina", "Pájaros con mancuernas"] },
+      { id: "curl-barra", name: "Curl de Bíceps con Barra", equip: "Barra / Mancuernas", sets: 3, repMin: 10, repMax: 12, rest: 60, compound: false, alts: ["Curl en polea baja", "Curl en banco Scott"] },
+      { id: "curl-martillo", name: "Curl Martillo", equip: "Mancuernas", sets: 3, repMin: 10, repMax: 12, rest: 60, compound: false, alts: ["Curl martillo en polea con cuerda", "Curl martillo en máquina"] },
+    ],
+    abs: [ { id: "elev-rodillas", name: "Elevaciones de Rodillas", equip: "Peso Corporal", sets: 2, repMin: 8, repMax: 12, rest: 45, compound: false, bodyweight: true, alts: ["Elevación de piernas en el suelo", "Rueda abdominal"] } ],
+  },
+  { id: "pierna", label: "Pierna", sub: "Cuádriceps · Isquios · Glúteo",
+    exercises: [
+      { id: "prensa", name: "Prensa de Piernas", equip: "Máquina", sets: 4, repMin: 8, repMax: 12, rest: 90, compound: true, alts: ["Hack squat", "Sentadilla en máquina Smith"] },
+      { id: "hack-squat", name: "Hack Squat", equip: "Máquina", sets: 3, repMin: 10, repMax: 12, rest: 90, compound: true, alts: ["Prensa (ángulo distinto)", "Sentadilla búlgara con mancuernas"] },
+      { id: "peso-muerto-rumano", name: "Peso Muerto Rumano con Mancuernas", equip: "Mancuernas", sets: 3, repMin: 10, repMax: 12, rest: 90, compound: true, alts: ["Peso muerto rumano en máquina", "Curl femoral parado"] },
+      { id: "curl-femoral", name: "Curl Femoral", equip: "Máquina", sets: 3, repMin: 10, repMax: 15, rest: 60, compound: false, alts: ["Curl femoral parado", "Peso muerto rumano"] },
+      { id: "ext-piernas", name: "Extensiones de Piernas", equip: "Máquina", sets: 3, repMin: 12, repMax: 15, rest: 60, compound: false, alts: ["Sentadilla en máquina", "Prensa con pie alto"] },
+      { id: "elev-talones", name: "Elevación de Talones", equip: "Máquina", sets: 3, repMin: 15, repMax: 20, rest: 45, compound: false, alts: ["Elevación de talones sentado", "Elevación de talones en prensa"] },
+    ],
+    abs: [],
+  },
+];
+const TAGS = [ { id: "facil", label: "Sobraron reps" }, { id: "justo", label: "Justo" }, { id: "fallo", label: "Al fallo" } ];
+const WORK_SECONDS_PER_SET = 40;
+const todayStr = () => new Date().toISOString().slice(0,10);
+const estimateMinutes = (list) => Math.round(list.reduce((t,ex)=>t+ex.sets*(WORK_SECONDS_PER_SET+ex.rest),0)/60);
+
+// ---------- Storage (localStorage, device-only) ----------
+const store = {
+  get(key, fallback) { try { const v = localStorage.getItem("ppl:"+key); return v ? JSON.parse(v) : fallback; } catch(e){ return fallback; } },
+  set(key, value) { try { localStorage.setItem("ppl:"+key, JSON.stringify(value)); } catch(e){} },
+};
+
+// ---------- Sound / vibration ----------
+function playBeep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [ [880,0], [1180,180] ].forEach(([freq, delay]) => {
+      setTimeout(() => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = "sine"; o.frequency.value = freq;
+        g.gain.setValueAtTime(0.001, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.3, ctx.currentTime+0.02);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.5);
+        o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+0.55);
+      }, delay);
+    });
+  } catch(e) {}
+  if (navigator.vibrate) navigator.vibrate([200,100,200]);
+}
+
+// ---------- Suggestion logic ----------
+function computeSuggestion(ex, loggedSets) {
+  if (!loggedSets || loggedSets.length < ex.sets) return null;
+  const failCount = loggedSets.filter(s=>s.tag==="fallo").length;
+  const belowMin = loggedSets.filter(s=>s.reps < ex.repMin).length;
+  const allAtTop = loggedSets.every(s=>s.reps >= ex.repMax);
+  const anyEasyAtTop = loggedSets.some(s=>s.reps >= ex.repMax && s.tag==="facil");
+  if (belowMin >= 2 || failCount >= Math.ceil(ex.sets/2)) {
+    return { dir:"down", amount: ex.bodyweight?0:(ex.compound?2.5:1.25), reason:"No llegaste al mínimo de reps en varias series." };
+  }
+  if (allAtTop && (anyEasyAtTop || failCount===0)) {
+    return { dir:"up", amount: ex.bodyweight?0:(ex.compound?2.5:1.25), reason:"Completaste el techo del rango en todas las series." };
+  }
+  return { dir:"same", amount:0, reason:"Seguí con el mismo peso, todavía hay margen dentro del rango." };
+}
+
+// ---------- App state ----------
+const state = {
+  dayId: store.get("lastDay", "empuje"),
+  showAbs: true,
+  alts: store.get("alts", {}),
+  openCards: {},
+  rows: {}, // exId -> array of {weight, reps, tag, done}
+  savedOnce: {},
+  suggestions: {},
+  rest: null, // {seconds, name, remaining, running, timerHandle}
+};
+
+function getExById(id) {
+  for (const d of DAYS) for (const ex of [...d.exercises, ...d.abs]) if (ex.id === id) return ex;
+}
+function ensureRows(ex) {
+  if (!state.rows[ex.id]) state.rows[ex.id] = Array.from({length: ex.sets}, () => ({weight:"", reps:"", tag:"justo", done:false}));
+  return state.rows[ex.id];
+}
+
+function render() { document.getElementById("root").innerHTML = App(); attachHandlers(); }
+
+function App() {
+  const day = DAYS.find(d => d.id === state.dayId);
+  const allEx = state.showAbs ? [...day.exercises, ...day.abs] : day.exercises;
+  const mins = estimateMinutes(allEx);
+  return `
+    <div class="wrap">
+      <div class="brand"><span class="dot"></span><span>Rutina PPL · Hipertrofia</span></div>
+      <div class="tabs">
+        ${DAYS.map(d => `<button class="tab ${d.id===state.dayId?'active':''}" data-day="${d.id}">${d.label}</button>`).join("")}
+      </div>
+      <div class="head">
+        <h1>${day.sub}</h1>
+        <div class="time">⏱ ~${mins} min</div>
+      </div>
+      ${day.exercises.map(ex => cardHTML(ex)).join("")}
+      ${day.abs.length ? `
+        <div class="abs-toggle">
+          <span>Extra · Abdominales</span>
+          <button data-toggle-abs="1">${state.showAbs ? "Ocultar" : "Mostrar"}</button>
+        </div>
+        ${state.showAbs ? day.abs.map(ex => cardHTML(ex)).join("") : ""}
+      ` : ""}
+    </div>
+    <div class="overlay ${state.rest ? 'show' : ''}" id="restOverlay">
+      ${state.rest ? restHTML() : ""}
+    </div>
+  `;
+}
+
+function cardHTML(ex) {
+  const open = !!state.openCards[ex.id];
+  const alt = state.alts[ex.id];
+  const displayName = alt || ex.name;
+  const lastWeight = store.get("weight:"+ex.id, null);
+  const rows = ensureRows(ex);
+  const sug = state.suggestions[ex.id];
+  return `
+    <div class="card ${open?'open':''}">
+      <button class="card-head" data-toggle-card="${ex.id}">
+        <div>
+          <div class="name">${ex.compound ? '🔥 ' : ''}${displayName}</div>
+          <div class="meta">${ex.equip} · ${ex.sets} series · ${ex.repMin}-${ex.repMax} reps${lastWeight!=null && !ex.bodyweight ? ` · último: ${lastWeight}kg` : ""}</div>
+        </div>
+        <span class="chev">›</span>
+      </button>
+      <div class="card-body">
+        <div class="alt-row-wrap">
+          <button class="altbtn" data-toggle-alts="${ex.id}">⟲ Ejercicios alternativos</button>
+        </div>
+        ${state.openCards["alts:"+ex.id] ? `
+          <div class="alts">
+            <button class="alt-opt ${!alt?'active':''}" data-set-alt="${ex.id}" data-alt-name="">${ex.name} (original)</button>
+            ${ex.alts.map(a => `<button class="alt-opt ${alt===a?'active':''}" data-set-alt="${ex.id}" data-alt-name="${a}">${a}</button>`).join("")}
+          </div>
+        ` : ""}
+        <div class="grid-head"><span></span><span>Kg</span><span>Reps</span><span>Sensación</span><span></span></div>
+        ${rows.map((row, idx) => `
+          <div class="set-row">
+            <div class="idx">${idx+1}</div>
+            <input type="text" inputmode="decimal" data-field="weight" data-ex="${ex.id}" data-idx="${idx}" value="${row.weight}" placeholder="${ex.bodyweight?'—':'kg'}" ${ex.bodyweight?'disabled':''} />
+            <input type="text" inputmode="numeric" data-field="reps" data-ex="${ex.id}" data-idx="${idx}" value="${row.reps}" placeholder="reps" />
+            <select data-field="tag" data-ex="${ex.id}" data-idx="${idx}">
+              ${TAGS.map(t => `<option value="${t.id}" ${row.tag===t.id?'selected':''}>${t.label}</option>`).join("")}
+            </select>
+            <button class="okbtn ${row.done?'done':''}" data-complete="${ex.id}" data-idx="${idx}" ${(!row.done && row.reps==="")?'disabled':''}>${row.done?'✎':'OK'}</button>
+          </div>
+        `).join("")}
+        ${sug ? `
+          <div class="suggestion ${sug.dir}">
+            <div>
+              <div class="title">${sug.dir==='up' ? `↑ Subí ~${sug.amount}kg la próxima` : sug.dir==='down' ? `↓ Bajá ~${sug.amount}kg la próxima` : '— Mantené el peso'}</div>
+              <div class="reason">${sug.reason}</div>
+            </div>
+          </div>
+        ` : ""}
+      </div>
+    </div>
+  `;
+}
+
+function restHTML() {
+  const r = state.rest;
+  const pct = Math.max(0, Math.min(1, 1 - r.remaining / r.seconds));
+  const radius = 88, circ = 2*Math.PI*radius, dash = circ*pct;
+  const mm = Math.floor(Math.max(0,r.remaining)/60), ss = Math.max(0,r.remaining)%60;
+  const color = r.remaining <= 5 ? "#FB7185" : "#5EEAD4";
+  return `
+    <button class="close" data-close-rest="1">✕</button>
+    <div class="label">Descanso · ${r.name}</div>
+    <div class="ring-wrap">
+      <svg width="220" height="220" style="transform: rotate(-90deg)">
+        <circle cx="110" cy="110" r="${radius}" stroke="#1C2127" stroke-width="12" fill="none" />
+        <circle cx="110" cy="110" r="${radius}" stroke="${color}" stroke-width="12" fill="none"
+          stroke-dasharray="${circ}" stroke-dashoffset="${circ-dash}" stroke-linecap="round"
+          style="transition: stroke-dashoffset 1s linear, stroke 0.3s" />
+      </svg>
+      <div class="ring-time">${mm}:${ss.toString().padStart(2,"0")}</div>
+    </div>
+    <div class="actions">
+      <button data-toggle-run="1">${r.running ? "⏸ Pausar" : "▶ Reanudar"}</button>
+      <button data-add-time="1">+15s</button>
+      <button class="skip" data-close-rest="1">Saltar</button>
+    </div>
+  `;
+}
+
+// ---------- Rest timer engine ----------
+function startRest(seconds, name) {
+  if (state.rest && state.rest.timerHandle) clearInterval(state.rest.timerHandle);
+  state.rest = { seconds, name, remaining: seconds, running: true, fired: false };
+  state.rest.timerHandle = setInterval(tickRest, 1000);
+  render();
+}
+function tickRest() {
+  if (!state.rest || !state.rest.running) return;
+  state.rest.remaining -= 1;
+  if (state.rest.remaining <= 0 && !state.rest.fired) {
+    state.rest.fired = true;
+    playBeep();
+  }
+  render();
+}
+function closeRest() {
+  if (state.rest && state.rest.timerHandle) clearInterval(state.rest.timerHandle);
+  state.rest = null;
+  render();
+}
+
+// ---------- Handlers ----------
+function attachHandlers() {
+  document.querySelectorAll("[data-day]").forEach(el => el.onclick = () => {
+    state.dayId = el.dataset.day; store.set("lastDay", state.dayId); render();
+  });
+  document.querySelectorAll("[data-toggle-card]").forEach(el => el.onclick = () => {
+    const id = el.dataset.toggleCard; state.openCards[id] = !state.openCards[id]; render();
+  });
+  document.querySelectorAll("[data-toggle-abs]").forEach(el => el.onclick = () => { state.showAbs = !state.showAbs; render(); });
+  document.querySelectorAll("[data-toggle-alts]").forEach(el => el.onclick = () => {
+    const key = "alts:"+el.dataset.toggleAlts; state.openCards[key] = !state.openCards[key]; render();
+  });
+  document.querySelectorAll("[data-set-alt]").forEach(el => el.onclick = () => {
+    const exId = el.dataset.setAlt, name = el.dataset.altName || null;
+    state.alts[exId] = name; store.set("alts", state.alts);
+    state.openCards["alts:"+exId] = false; render();
+  });
+  document.querySelectorAll("input[data-field], select[data-field]").forEach(el => {
+    el.onchange = el.oninput = () => {
+      const exId = el.dataset.ex, idx = parseInt(el.dataset.idx,10), field = el.dataset.field;
+      let val = el.value;
+      if (field === "weight") val = val.replace(/[^0-9.]/g,"");
+      if (field === "reps") val = val.replace(/[^0-9]/g,"");
+      state.rows[exId][idx][field] = val;
+      // re-render only to update OK button enabled state, but avoid stealing focus:
+      if (field !== "tag") { el.value = val; syncOkButton(exId, idx); } else render();
+    };
+  });
+  document.querySelectorAll("[data-complete]").forEach(el => el.onclick = () => {
+    const exId = el.dataset.complete, idx = parseInt(el.dataset.idx,10);
+    completeOrUnlock(exId, idx);
+  });
+  document.querySelectorAll("[data-close-rest]").forEach(el => el.onclick = closeRest);
+  document.querySelectorAll("[data-toggle-run]").forEach(el => el.onclick = () => { state.rest.running = !state.rest.running; render(); });
+  document.querySelectorAll("[data-add-time]").forEach(el => el.onclick = () => { state.rest.remaining += 15; render(); });
+}
+
+function syncOkButton(exId, idx) {
+  const btn = document.querySelector(`[data-complete="${exId}"][data-idx="${idx}"]`);
+  if (!btn) return;
+  const row = state.rows[exId][idx];
+  btn.disabled = !row.done && row.reps === "";
+}
+
+async function completeOrUnlock(exId, idx) {
+  const ex = getExById(exId);
+  const rows = state.rows[exId];
+  const row = rows[idx];
+  if (row.done) { row.done = false; state.suggestions[exId] = null; render(); return; }
+  if (row.reps === "") return;
+  row.done = true;
+  startRest(ex.rest, state.alts[exId] || ex.name);
+
+  const allDone = rows.every(r => r.done);
+  if (allDone) {
+    const loggedSets = rows.map(r => ({ weight: r.weight===""?null:parseFloat(r.weight), reps: parseInt(r.reps,10)||0, tag: r.tag }));
+    const sug = computeSuggestion(ex, loggedSets);
+    state.suggestions[exId] = sug;
+
+    const hist = store.get("history:"+exId, []);
+    if (state.savedOnce[exId] && hist.length) hist.pop();
+    hist.push({ date: todayStr(), sets: loggedSets });
+    store.set("history:"+exId, hist.slice(-20));
+    state.savedOnce[exId] = true;
+
+    if (sug && sug.dir !== "same" && loggedSets[0].weight != null) {
+      const base = loggedSets[loggedSets.length-1].weight || loggedSets[0].weight;
+      const newWeight = sug.dir === "up" ? base + sug.amount : Math.max(0, base - sug.amount);
+      store.set("weight:"+exId, newWeight);
+    } else if (loggedSets[0].weight != null) {
+      store.set("weight:"+exId, loggedSets[loggedSets.length-1].weight);
+    }
+  }
+  render();
+}
+
+render();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
